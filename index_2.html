@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Dravex Studio — Professional 2D/3D digital art commissions. VTuber models, character design, pin art, 3D models and more.">
+  <title>Dravex Studio — Digital Art Commissions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #04020f;
+      --v1: #7c3aed;
+      --v2: #a855f7;
+      --pk: #e879f9;
+      --pk2: #ec4899;
+      --cy: #22d3ee;
+      --cy2: #06b6d4;
+      --gd: #fbbf24;
+      --glass-bg: rgba(255,255,255,0.04);
+      --glass-border: rgba(255,255,255,0.09);
+      --text: #f0eaff;
+      --text-light: #8b7db8;
+      --radius: 20px;
+      --transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--bg);overflow-x:hidden;cursor:none;}
+
+    /* ── CURSOR ── */
+    #cursorDot{position:fixed;width:10px;height:10px;border-radius:50%;background:var(--v2);pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s;mix-blend-mode:screen;}
+    #cursorRing{position:fixed;width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(168,85,247,0.5);pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .25s,height .25s,border-color .2s;}
+    #cursorCanvas{position:fixed;inset:0;z-index:99997;pointer-events:none;}
+
+    /* ── BLOBS ── */
+    .blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.18;pointer-events:none;z-index:0;}
+    .b1{width:600px;height:600px;background:var(--v1);top:-10%;left:-10%;animation:morph1 14s ease-in-out infinite;}
+    .b2{width:500px;height:500px;background:var(--pk2);bottom:-10%;right:-5%;animation:morph2 16s ease-in-out infinite;}
+    .b3{width:400px;height:400px;background:var(--cy);top:40%;left:50%;transform:translateX(-50%);animation:morph3 18s ease-in-out infinite;}
+    .b4{width:300px;height:300px;background:var(--gd);top:20%;right:5%;animation:morph1 11s ease-in-out infinite reverse;opacity:.1;}
+    @keyframes morph1{0%,100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%;}25%{border-radius:30% 60% 70% 40%/50% 60% 30% 60%;}50%{border-radius:50% 60% 30% 60%/30% 70% 60% 40%;}75%{border-radius:70% 30% 60% 40%/40% 50% 60% 30%;}}
+    @keyframes morph2{0%,100%{border-radius:40% 60% 70% 30%/40% 50% 60% 50%;}33%{border-radius:70% 30% 40% 60%/60% 40% 30% 70%;}66%{border-radius:30% 70% 60% 40%/70% 30% 50% 50%;}}
+    @keyframes morph3{0%,100%{border-radius:50% 50% 30% 70%/50% 60% 40% 50%;}40%{border-radius:70% 30% 50% 50%/30% 70% 50% 50%;}80%{border-radius:30% 60% 70% 40%/60% 40% 30% 60%;}}
+
+    #particlesCanvas{position:fixed;inset:0;z-index:1;pointer-events:none;}
+
+    /* ── NAVBAR ── */
+    nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.1rem 2.5rem;display:flex;align-items:center;justify-content:space-between;transition:var(--transition);}
+    nav.scrolled{background:rgba(4,2,15,0.75);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(168,85,247,0.18);box-shadow:0 4px 30px rgba(124,58,237,0.15);}
+    .nav-logo{display:flex;flex-direction:column;line-height:1;text-decoration:none;}
+    .nav-logo-main{font-family:'Syne',sans-serif;font-size:1.85rem;font-weight:800;letter-spacing:.06em;background:linear-gradient(135deg,var(--v2),var(--pk),var(--cy));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .nav-logo-sub{font-size:.58rem;font-weight:600;letter-spacing:.38em;text-transform:uppercase;color:var(--text-light);}
+    .nav-links{display:flex;align-items:center;gap:2.2rem;list-style:none;}
+    .nav-links a{text-decoration:none;color:var(--text-light);font-size:.88rem;font-weight:500;letter-spacing:.04em;transition:var(--transition);position:relative;}
+    .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1.5px;background:linear-gradient(90deg,var(--v2),var(--pk));border-radius:2px;transition:var(--transition);}
+    .nav-links a:hover{color:var(--text);}
+    .nav-links a:hover::after{width:100%;}
+    .status-badge{display:flex;align-items:center;gap:.45rem;padding:.38rem 1rem;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);border-radius:100px;font-size:.77rem;font-weight:700;color:#4ade80;letter-spacing:.04em;}
+    .status-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pls 2s infinite;}
+    @keyframes pls{0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,.5)}50%{box-shadow:0 0 0 7px rgba(74,222,128,0)}}
+    .hamburger{display:none;flex-direction:column;gap:5px;cursor:none;padding:4px;z-index:1001;}
+    .hamburger span{display:block;width:24px;height:2px;background:var(--text);border-radius:2px;transition:var(--transition);}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+    .hamburger.open span:nth-child(2){opacity:0;}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+    /* ── HERO ── */
+    #hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;padding:7rem 2rem 5rem;overflow:hidden;z-index:2;}
+    .hero-content{position:relative;z-index:2;max-width:860px;will-change:transform;}
+    .hero-badge{display:inline-flex;align-items:center;gap:.5rem;padding:.48rem 1.3rem;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.3);border-radius:100px;font-size:.76rem;font-weight:700;color:var(--v2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:1.8rem;animation:fadeUp .8s ease both;}
+    .hero-title{font-family:'Syne',sans-serif;font-size:clamp(4.5rem,13vw,10rem);font-weight:800;line-height:.95;margin-bottom:1rem;animation:fadeUp .85s .1s ease both;position:relative;display:inline-block;}
+
+    /* GLITCH */
+    .glitch{position:relative;background:linear-gradient(135deg,#fff 0%,var(--v2) 40%,var(--pk) 70%,var(--cy) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .glitch::before,.glitch::after{content:attr(data-text);position:absolute;top:0;left:0;width:100%;height:100%;-webkit-text-fill-color:transparent;background-clip:text;-webkit-background-clip:text;}
+    .glitch::before{background:linear-gradient(135deg,var(--pk),var(--pk2));-webkit-background-clip:text;background-clip:text;animation:glitch1 4s infinite;clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%);}
+    .glitch::after{background:linear-gradient(135deg,var(--cy),var(--cy2));-webkit-background-clip:text;background-clip:text;animation:glitch2 4s infinite;clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%);}
+    @keyframes glitch1{0%,90%,100%{transform:translate(0);opacity:0;}91%{transform:translate(-4px,2px);opacity:.9;}92%{transform:translate(4px,-2px);opacity:.9;}93%{transform:translate(-3px,0);opacity:.9;}94%{transform:translate(0);opacity:0;}96%{transform:translate(3px,-1px);opacity:.7;}97%{transform:translate(0);opacity:0;}}
+    @keyframes glitch2{0%,85%,100%{transform:translate(0);opacity:0;}86%{transform:translate(4px,1px);opacity:.9;}87%{transform:translate(-4px,-1px);opacity:.9;}88%{transform:translate(2px,2px);opacity:.9;}89%{transform:translate(0);opacity:0;}93%{transform:translate(-2px,1px);opacity:.6;}94%{transform:translate(0);opacity:0;}}
+
+    .hero-studio{font-family:'Syne',sans-serif;font-size:clamp(.8rem,1.8vw,1rem);font-weight:700;letter-spacing:.65em;text-transform:uppercase;color:var(--text-light);margin-bottom:1.8rem;animation:fadeUp .85s .18s ease both;}
+    .hero-typing-wrap{font-size:clamp(1rem,2.5vw,1.3rem);color:var(--text-light);font-weight:400;line-height:1.7;max-width:560px;margin:0 auto 2.2rem;animation:fadeUp .85s .26s ease both;min-height:2.6rem;}
+    #typingText{background:linear-gradient(90deg,var(--v2),var(--pk),var(--cy));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700;}
+    .cursor-blink{display:inline-block;width:2px;height:1.1em;background:var(--pk);margin-left:2px;vertical-align:middle;animation:blink .75s step-end infinite;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+    .hero-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin-bottom:2.6rem;animation:fadeUp .85s .34s ease both;}
+    .hero-tag{padding:.35rem .95rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:100px;font-size:.77rem;font-weight:600;color:var(--text-light);transition:var(--transition);}
+    .hero-tag:hover{background:rgba(168,85,247,0.15);border-color:rgba(168,85,247,0.4);color:var(--text);}
+    .hero-cta{display:inline-flex;align-items:center;gap:.7rem;padding:1.05rem 2.8rem;background:linear-gradient(135deg,var(--v1),var(--pk2));color:white;text-decoration:none;border-radius:100px;font-weight:700;font-size:.95rem;letter-spacing:.04em;box-shadow:0 0 40px rgba(124,58,237,.45),0 0 80px rgba(124,58,237,.2);transition:var(--transition);animation:fadeUp .85s .42s ease both;position:relative;overflow:hidden;}
+    .hero-cta::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--pk2),var(--v1));opacity:0;transition:opacity .3s ease;}
+    .hero-cta:hover{transform:translateY(-4px);box-shadow:0 0 60px rgba(232,121,249,.5),0 0 100px rgba(124,58,237,.3);}
+    .hero-cta:hover::before{opacity:1;}
+    .hero-cta span,.hero-cta svg{position:relative;z-index:1;}
+    .hero-cta svg{transition:transform .3s ease;}
+    .hero-cta:hover svg{transform:translateX(5px);}
+    .hero-scroll{position:absolute;bottom:2.2rem;left:50%;transform:translateX(-50%);animation:bounce 2.2s infinite;}
+    .hero-scroll svg{width:26px;height:26px;color:var(--v2);opacity:.6;}
+    @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(9px)}}
+
+    /* ── SECTIONS ── */
+    .section-wrap{padding:5.5rem 2rem;max-width:1200px;margin:0 auto;position:relative;z-index:2;}
+    .section-header{text-align:center;margin-bottom:4rem;}
+    .section-label{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--v2);margin-bottom:.9rem;}
+    .section-title{font-family:'Syne',sans-serif;font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.05;background:linear-gradient(135deg,var(--text) 0%,var(--v2) 50%,var(--pk) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .section-sub{margin-top:.75rem;color:var(--text-light);font-size:.95rem;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.7;}
+
+    /* ── GLASS CARD ── */
+    .gc{background:var(--glass-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:var(--radius);box-shadow:0 8px 32px rgba(0,0,0,.3);transition:box-shadow .35s ease,border-color .35s ease;transform-style:preserve-3d;will-change:transform;}
+    .gc:hover{box-shadow:0 20px 60px rgba(124,58,237,.25),0 0 30px rgba(232,121,249,.1);border-color:rgba(168,85,247,.35);}
+
+    /* ── SERVICES ── */
+    .services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5rem;}
+    .svc{padding:2.1rem;}
+    .svc-icon{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.55rem;margin-bottom:1.2rem;background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(232,121,249,.15));border:1px solid rgba(168,85,247,.2);}
+    .svc h3{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:.5rem;}
+    .svc p{color:var(--text-light);font-size:.88rem;line-height:1.75;}
+    .svc-tags{display:flex;flex-wrap:wrap;gap:.38rem;margin-top:.9rem;}
+    .svc-tag{padding:.2rem .7rem;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);border-radius:100px;font-size:.72rem;font-weight:700;color:var(--v2);}
+
+    /* ── GALLERY ── */
+    .gallery-grid{columns:3;column-gap:1.4rem;}
+    .gallery-item{break-inside:avoid;margin-bottom:1.4rem;border-radius:var(--radius);overflow:hidden;cursor:none;position:relative;transition:var(--transition);}
+    .gallery-item img{width:100%;display:block;border-radius:var(--radius);transition:transform .45s ease;}
+    .gallery-item:hover img{transform:scale(1.05);}
+    .gph{width:100%;border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;font-size:.82rem;font-weight:700;color:var(--text-light);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);transition:var(--transition);}
+    .gph:hover{transform:translateY(-5px);box-shadow:0 16px 40px rgba(124,58,237,.2);border-color:rgba(168,85,247,.3);}
+    .gph-icon{font-size:2.2rem;}
+    .gallery-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(4,2,15,.9),transparent);opacity:0;transition:opacity .3s ease;border-radius:var(--radius);display:flex;align-items:flex-end;padding:1.2rem;}
+    .gallery-item:hover .gallery-overlay{opacity:1;}
+    .gallery-overlay span{color:white;font-size:.82rem;font-weight:800;letter-spacing:.04em;}
+    .gallery-note{text-align:center;color:var(--text-light);font-size:.83rem;margin-top:1.5rem;opacity:.65;line-height:1.7;}
+    .gallery-note a{font-weight:800;text-decoration:none;background:linear-gradient(90deg,var(--v2),var(--pk));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+    /* ── LIGHTBOX ── */
+    .lightbox{display:none;position:fixed;inset:0;z-index:9999;background:rgba(4,2,15,.92);backdrop-filter:blur(24px);align-items:center;justify-content:center;}
+    .lightbox.active{display:flex;}
+    .lightbox-img{max-width:90vw;max-height:90vh;border-radius:var(--radius);box-shadow:0 30px 100px rgba(0,0,0,.6);}
+    .lbclose{position:absolute;top:1.5rem;right:1.5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:white;width:46px;height:46px;border-radius:50%;cursor:none;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:var(--transition);}
+    .lbclose:hover{background:rgba(232,121,249,.2);border-color:rgba(232,121,249,.4);}
+
+    /* ── PRICING ── */
+    .pricing-tabs{display:flex;justify-content:center;gap:.5rem;margin-bottom:3rem;flex-wrap:wrap;}
+    .ptab{padding:.58rem 1.55rem;border-radius:100px;border:1px solid rgba(168,85,247,.25);background:rgba(168,85,247,.06);color:var(--text-light);font-weight:700;font-size:.82rem;cursor:none;transition:var(--transition);font-family:'DM Sans',sans-serif;}
+    .ptab.active{background:linear-gradient(135deg,var(--v1),var(--pk2));color:white;border-color:transparent;box-shadow:0 0 30px rgba(124,58,237,.4);}
+    .ptab:hover:not(.active){border-color:rgba(168,85,247,.5);color:var(--text);}
+    .ppanel{display:none;animation:fadeUp .4s ease both;}
+    .ppanel.active{display:block;}
+    .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1.4rem;margin-bottom:1.5rem;}
+    .pcard{padding:1.75rem;text-align:center;}
+    .pcard-em{font-size:2rem;margin-bottom:.7rem;display:block;}
+    .pcard-name{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:var(--text);margin-bottom:.45rem;}
+    .pcard-desc{font-size:.78rem;color:var(--text-light);margin-bottom:.9rem;line-height:1.6;}
+    .pcard-price{font-family:'Syne',sans-serif;font-size:1.55rem;font-weight:800;background:linear-gradient(135deg,var(--v2),var(--pk));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .subsec{font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:700;color:var(--text);margin:2.2rem 0 1.1rem;text-align:center;}
+    .addon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:.7rem;margin-top:.5rem;}
+    .addon-item{padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center;gap:.8rem;}
+    .addon-name{font-size:.82rem;color:var(--text-light);font-weight:500;}
+    .addon-price{font-size:.82rem;font-weight:800;white-space:nowrap;background:linear-gradient(135deg,var(--cy),var(--cy2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .pt-container{margin-bottom:2rem;overflow:hidden;}
+    .pt-header{padding:.9rem 1.4rem;background:rgba(168,85,247,.1);border-bottom:1px solid rgba(168,85,247,.15);font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:var(--text);}
+    .pt-wrap{overflow-x:auto;}
+    table.ptable{width:100%;border-collapse:collapse;font-size:.82rem;}
+    table.ptable th{background:rgba(168,85,247,.08);color:var(--text);font-weight:700;padding:.72rem 1rem;text-align:left;white-space:nowrap;}
+    table.ptable td{padding:.65rem 1rem;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text-light);}
+    table.ptable tr:last-child td{border-bottom:none;}
+    table.ptable tr:hover td{background:rgba(168,85,247,.06);color:var(--text);}
+    .disclaimer{text-align:center;font-size:.78rem;color:var(--text-light);font-style:italic;margin-top:1.2rem;}
+
+    /* ── CONTACT ── */
+    .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;max-width:860px;margin:0 auto;}
+    .ccard{padding:2.1rem;text-align:center;text-decoration:none;display:block;color:inherit;}
+    .ccard-icon{width:62px;height:62px;border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.75rem;}
+    .ci-ig{background:linear-gradient(135deg,rgba(252,182,159,.3),rgba(255,154,158,.3));}
+    .ci-dc{background:linear-gradient(135deg,rgba(129,140,248,.3),rgba(165,180,252,.3));}
+    .ci-em{background:linear-gradient(135deg,rgba(34,211,238,.2),rgba(6,182,212,.2));}
+    .ccard h3{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:var(--text);margin-bottom:.4rem;}
+    .ccard p{color:var(--text-light);font-size:.88rem;font-weight:600;}
+    .chint{font-size:.78rem;margin-top:.7rem;font-weight:800;display:block;background:linear-gradient(90deg,var(--v2),var(--pk));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+    /* ── FOOTER ── */
+    footer{text-align:center;padding:3rem 2rem;border-top:1px solid rgba(168,85,247,.12);position:relative;z-index:2;}
+    .flogo{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;margin-bottom:.4rem;background:linear-gradient(135deg,var(--v2),var(--pk),var(--cy));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .ftag{color:var(--text-light);font-size:.83rem;margin-bottom:1.5rem;}
+    .flinks{display:flex;justify-content:center;gap:1.6rem;margin-bottom:1.4rem;flex-wrap:wrap;}
+    .flinks a{color:var(--text-light);text-decoration:none;font-size:.83rem;font-weight:600;transition:var(--transition);}
+    .flinks a:hover{color:var(--v2);}
+    .fcopy{color:var(--text-light);font-size:.78rem;opacity:.45;}
+
+    /* ── DIVIDER ── */
+    .divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,.4),rgba(232,121,249,.4),rgba(34,211,238,.4),transparent);}
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(35px)}to{opacity:1;transform:translateY(0)}}
+    .reveal{opacity:0;transform:translateY(40px);transition:opacity .75s ease,transform .75s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:900px){.gallery-grid{columns:2;}}
+    @media(max-width:600px){
+      .gallery-grid{columns:1;}
+      .hamburger{display:flex;}
+      .status-badge{display:none;}
+      .nav-links{display:none;position:fixed;inset:0;background:rgba(4,2,15,.97);backdrop-filter:blur(24px);flex-direction:column;align-items:center;justify-content:center;gap:2.2rem;z-index:1000;}
+      .nav-links.open{display:flex;}
+      .nav-links a{font-size:1.2rem;}
+      nav{padding:1rem 1.5rem;}
+      body{cursor:auto;}
+      #cursorDot,#cursorRing,#cursorCanvas{display:none;}
+      .pricing-grid{grid-template-columns:1fr 1fr;}
+    }
+    @media(max-width:420px){.pricing-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+
+<div id="cursorDot"></div>
+<div id="cursorRing"></div>
+<canvas id="cursorCanvas"></canvas>
+
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="blob b3"></div>
+<div class="blob b4"></div>
+<canvas id="particlesCanvas"></canvas>
+
+<!-- ═══ NAVBAR ═══ -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">
+    <span class="nav-logo-main">DRAVEX</span>
+    <span class="nav-logo-sub">Studio</span>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#services" onclick="closeMenu()">Services</a></li>
+    <li><a href="#gallery" onclick="closeMenu()">Gallery</a></li>
+    <li><a href="#pricing" onclick="closeMenu()">Pricing</a></li>
+    <li><a href="#contact" onclick="closeMenu()">Contact</a></li>
+  </ul>
+  <div class="status-badge"><span class="status-dot"></span>Commissions Open</div>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div class="hero-content" id="heroContent">
+    <div class="hero-badge">✦ Digital Art Commissions</div>
+    <h1 class="hero-title"><span class="glitch" data-text="DRAVEX">DRAVEX</span></h1>
+    <p class="hero-studio">Studio</p>
+    <div class="hero-typing-wrap">Specializing in <span id="typingText"></span><span class="cursor-blink"></span></div>
+    <div class="hero-tags">
+      <span class="hero-tag">🎨 Character Design</span>
+      <span class="hero-tag">🎭 VTuber Rigging</span>
+      <span class="hero-tag">🧊 3D Modeling</span>
+      <span class="hero-tag">📌 Pin Art</span>
+      <span class="hero-tag">✨ Emotes</span>
+    </div>
+    <a href="#contact" class="hero-cta">
+      <span>Commission Me</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+  </div>
+  <div class="hero-scroll">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ SERVICES ═══ -->
+<div class="section-wrap" id="services">
+  <div class="section-header reveal">
+    <span class="section-label">✦ What I Offer</span>
+    <h2 class="section-title">Services</h2>
+    <p class="section-sub">Professional digital art across 2D, 3D, and everything in between.</p>
+  </div>
+  <div class="services-grid">
+    <div class="gc svc reveal"><div class="svc-icon">🎨</div><h3>Character Design</h3><p>Original characters, OC art, yumeshipping, fan art and more. Full body to bust up — your vision brought to life.</p><div class="svc-tags"><span class="svc-tag">Full Body</span><span class="svc-tag">Half Body</span><span class="svc-tag">Bust Up</span><span class="svc-tag">OC Art</span><span class="svc-tag">Fan Art</span></div></div>
+    <div class="gc svc reveal"><div class="svc-icon">🎭</div><h3>VTuber Models</h3><p>High-res model art with full Live2D rigging. Bust-up to full-body with professional physics, expressions &amp; add-ons.</p><div class="svc-tags"><span class="svc-tag">Model Art</span><span class="svc-tag">Live2D Rigging</span><span class="svc-tag">Expressions</span><span class="svc-tag">Commercial Use</span></div></div>
+    <div class="gc svc reveal"><div class="svc-icon">🧊</div><h3>3D Models</h3><p>Game assets, animation rigs, and 3D printable models. From low-poly mobile to AAA-quality hero assets.</p><div class="svc-tags"><span class="svc-tag">Animation</span><span class="svc-tag">Game Assets</span><span class="svc-tag">3D Printing</span><span class="svc-tag">PBR Textures</span></div></div>
+    <div class="gc svc reveal"><div class="svc-icon">📌</div><h3>Pin Designs</h3><p>Enamel pin artwork crafted for production. Bold, clean designs built for hard or soft enamel manufacturing.</p><div class="svc-tags"><span class="svc-tag">Enamel Pins</span><span class="svc-tag">Hard Enamel</span><span class="svc-tag">Collectibles</span></div></div>
+    <div class="gc svc reveal"><div class="svc-icon">✦</div><h3>Logos &amp; Branding</h3><p>Clean studio logos and branding assets. Character-included and no-character options available.</p><div class="svc-tags"><span class="svc-tag">Studio Logos</span><span class="svc-tag">Brand Assets</span><span class="svc-tag">Watermarks</span></div></div>
+    <div class="gc svc reveal"><div class="svc-icon">💬</div><h3>Emotes &amp; Alerts</h3><p>Stream-ready emotes, sub badges, alerts, and starting soon panels — static or animated.</p><div class="svc-tags"><span class="svc-tag">Emotes</span><span class="svc-tag">Alerts</span><span class="svc-tag">Animated</span><span class="svc-tag">Panels</span></div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ GALLERY ═══ -->
+<div class="section-wrap" id="gallery">
+  <div class="section-header reveal">
+    <span class="section-label">✦ Portfolio</span>
+    <h2 class="section-title">My Work</h2>
+    <p class="section-sub">A selection of commissions and personal projects.</p>
+  </div>
+  <div class="gallery-grid" id="galleryGrid">
+    <div class="gallery-item reveal"><div class="gph" style="height:280px;padding:2rem;"><span class="gph-icon">🎨</span><span>Character Design</span><small style="opacity:.5">Full Body Commission</small></div></div>
+    <div class="gallery-item reveal"><div class="gph" style="height:220px;padding:2rem;"><span class="gph-icon">🎭</span><span>VTuber Model Art</span><small style="opacity:.5">Half Body</small></div></div>
+    <div class="gallery-item reveal"><div class="gph" style="height:320px;padding:2rem;"><span class="gph-icon">🧊</span><span>3D Character Model</span><small style="opacity:.5">Game Asset</small></div></div>
+    <div class="gallery-item reveal"><div class="gph" style="height:240px;padding:2rem;"><span class="gph-icon">📌</span><span>Pin Design</span><small style="opacity:.5">Enamel Pin Art</small></div></div>
+    <div class="gallery-item reveal"><div class="gph" style="height:295px;padding:2rem;"><span class="gph-icon">🎨</span><span>OC Commission</span><small style="opacity:.5">Bust Up</small></div></div>
+    <div class="gallery-item reveal"><div class="gph" style="height:260px;padding:2rem;"><span class="gph-icon">💬</span><span>Emote Pack</span><small style="opacity:.5">Animated Stream Emotes</small></div></div>
+    <div class="gallery-item reveal"><div class="gph" style="height:200px;padding:2rem;"><span class="gph-icon">✦</span><span>Logo Design</span><small style="opacity:.5">Studio Branding</small></div></div>
+    <div class="gallery-item reveal"><div class="gph" style="height:340px;padding:2rem;"><span class="gph-icon">🎭</span><span>Full VTuber Model</span><small style="opacity:.5">Full Body + Live2D Rig</small></div></div>
+    <div class="gallery-item reveal"><div class="gph" style="height:230px;padding:2rem;"><span class="gph-icon">🧊</span><span>3D Print Model</span><small style="opacity:.5">Miniature Figure</small></div></div>
+  </div>
+  <p class="gallery-note">
+    Gallery coming soon — follow <a href="https://www.instagram.com/dravex_studio" target="_blank" rel="noopener">@dravex_studio</a> on Instagram for the latest work.
+  </p>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ PRICING ═══ -->
+<div class="section-wrap" id="pricing">
+  <div class="section-header reveal">
+    <span class="section-label">✦ Rates</span>
+    <h2 class="section-title">Pricing</h2>
+    <p class="section-sub">Transparent pricing for every service. DM for custom quotes.</p>
+  </div>
+  <div class="pricing-tabs">
+    <button class="ptab active" onclick="switchTab('2d')">🎨 2D Art</button>
+    <button class="ptab" onclick="switchTab('vtuber')">🎭 VTuber Models</button>
+    <button class="ptab" onclick="switchTab('3d')">🧊 3D Models</button>
+  </div>
+
+  <!-- 2D -->
+  <div class="ppanel active" id="tab-2d">
+    <p class="subsec">Character Design</p>
+    <div class="pricing-grid">
+      <div class="gc pcard reveal"><span class="pcard-em">🖼️</span><div class="pcard-name">Full Body</div><div class="pcard-desc">Complete character illustration with background or simple BG</div><div class="pcard-price">$120</div></div>
+      <div class="gc pcard reveal"><span class="pcard-em">👤</span><div class="pcard-name">Half Body</div><div class="pcard-desc">Character from waist up with detailed shading and expression</div><div class="pcard-price">$80</div></div>
+      <div class="gc pcard reveal"><span class="pcard-em">🖌️</span><div class="pcard-name">Bust Up</div><div class="pcard-desc">Head and shoulders portrait — great for profile art</div><div class="pcard-price">$40</div></div>
+    </div>
+    <p class="subsec">Stream &amp; Brand Assets</p>
+    <div class="pricing-grid">
+      <div class="gc pcard reveal"><span class="pcard-em">✦</span><div class="pcard-name">Logo</div><div class="pcard-desc">Studio or brand logo, no character</div><div class="pcard-price">$50–$100</div></div>
+      <div class="gc pcard reveal"><span class="pcard-em">😄</span><div class="pcard-name">Static Emote / Alert</div><div class="pcard-desc">Stream-ready static emote or alert graphic</div><div class="pcard-price">$30</div></div>
+      <div class="gc pcard reveal"><span class="pcard-em">✨</span><div class="pcard-name">Animated Emote</div><div class="pcard-desc">Fully animated emote for Twitch or YouTube</div><div class="pcard-price">$40</div></div>
+      <div class="gc pcard reveal"><span class="pcard-em">🎬</span><div class="pcard-name">Starting Soon Panel</div><div class="pcard-desc">Custom waiting / starting soon screen for streams</div><div class="pcard-price">$150–$500</div></div>
+    </div>
+    <p class="disclaimer">* TAT and final price may vary with complexity and current workload.</p>
+  </div>
+
+  <!-- VTUBER -->
+  <div class="ppanel" id="tab-vtuber">
+    <p class="subsec">Model Art</p>
+    <div class="pricing-grid">
+      <div class="gc pcard reveal"><span class="pcard-em">🎭</span><div class="pcard-name">Bust-Up Art</div><div class="pcard-desc">Min 5000×10000px · 150 DPI · PSD + PNG/JPG · Showcase design &amp; video · 2 expressions · Commercial use</div><div class="pcard-price">$150</div></div>
+      <div class="gc pcard reveal"><span class="pcard-em">🎭</span><div class="pcard-name">Half-Body Art</div><div class="pcard-desc">Min 5000×10000px · 150 DPI · PSD + PNG/JPG · Showcase design &amp; video · 3 expressions · Commercial use</div><div class="pcard-price">$200</div></div>
+      <div class="gc pcard reveal"><span class="pcard-em">🎭</span><div class="pcard-name">Full-Body Art</div><div class="pcard-desc">Min 5000×10000px · 150 DPI · PSD + PNG/JPG · Showcase design &amp; video · 4 expressions · Commercial use</div><div class="pcard-price">$250</div></div>
+    </div>
+    <p class="subsec">Live2D Rigging</p>
+    <div class="pricing-grid">
+      <div class="gc pcard reveal"><span class="pcard-em">🦴</span><div class="pcard-name">Bust-Up Rig</div><div class="pcard-desc">Head XYZ · Standard Eyes Physics · Standard Physics · 2 expressions</div><div class="pcard-price">$300</div></div>
+      <div class="gc pcard reveal"><span class="pcard-em">🦴</span><div class="pcard-name">Half-Body Rig</div><div class="pcard-desc">Head XYZ · Eyes &amp; Body Physics · Body XZ · Augment Physics · Toggle Reflect · 3 expressions</div><div class="pcard-price">$400</div></div>
+      <div class="gc pcard reveal"><span class="pcard-em">🦴</span><div class="pcard-name">Full-Body Rig</div><div class="pcard-desc">Advanced full physics · Full body XY · Hips ZY · Body Lean · Toggle Reflect · 4 expressions</div><div class="pcard-price">$500</div></div>
+    </div>
+    <p class="subsec">Add-Ons (Art + Rig)</p>
+    <div class="addon-grid">
+      <div class="gc addon-item reveal"><span class="addon-name">VBridger (Cheekpuff, Mouth ×5)</span><span class="addon-price">$70</span></div>
+      <div class="gc addon-item reveal"><span class="addon-name">Tongueout (VBridger req.)</span><span class="addon-price">$30</span></div>
+      <div class="gc addon-item reveal"><span class="addon-name">Chibi Transformation (Rig)</span><span class="addon-price">$60</span></div>
+      <div class="gc addon-item reveal"><span class="addon-name">Alternative Hairstyle</span><span class="addon-price">$60–$150</span></div>
+      <div class="gc addon-item reveal"><span class="addon-name">Alternative Outfit</span><span class="addon-price">$250–$500</span></div>
+      <div class="gc addon-item reveal"><span class="addon-name">Alternative Hands Pose</span><span class="addon-price">$40</span></div>
+      <div class="gc addon-item reveal"><span class="addon-name">Alternative Tail</span><span class="addon-price">$30–$70</span></div>
+      <div class="gc addon-item reveal"><span class="addon-name">Wings</span><span class="addon-price">$50–$80</span></div>
+      <div class="gc addon-item reveal"><span class="addon-name">Pet</span><span class="addon-price">$100–$180</span></div>
+      <div class="gc addon-item reveal"><span class="addon-name">Extra Expression</span><span class="addon-price">$25</span></div>
+      <div class="gc addon-item reveal"><span class="addon-name">Hand Tracking 90°</span><span class="addon-price">$90</span></div>
+      <div class="gc addon-item reveal"><span class="addon-name">Hand Tracking 180°</span><span class="addon-price">$125</span></div>
+      <div class="gc addon-item reveal"><span class="addon-name">JoyStick</span><span class="addon-price">$80</span></div>
+    </div>
+    <p class="disclaimer">* All packages include Commercial Use. TAT varies by complexity.</p>
+  </div>
+
+  <!-- 3D -->
+  <div class="ppanel" id="tab-3d">
+    <div class="gc pt-container reveal">
+      <div class="pt-header">🎬 For Animation</div>
+      <div class="pt-wrap">
+        <table class="ptable">
+          <tr><th>Asset Type</th><th>Complexity Level</th><th>Cost Estimate</th><th>TAT</th></tr>
+          <tr><td>Cartoon / Stylized Character</td><td>Simple (blobby shapes)</td><td>$300 – $500</td><td>1–2 Weeks</td></tr>
+          <tr><td>Main Character (Feature)</td><td>Medium (Pixar-style, hair sim)</td><td>$500 – $1,000</td><td>3–5 Weeks</td></tr>
+          <tr><td>Photorealistic Human</td><td>High (VFX, digital double)</td><td>$1,200 – $5,000+</td><td>6–10 Weeks</td></tr>
+          <tr><td>Prop / Vehicle</td><td>Rigged (Car, robot)</td><td>$500 – $1,000</td><td>2–4 Weeks</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="gc pt-container reveal">
+      <div class="pt-header">🎮 For Video Games</div>
+      <div class="pt-wrap">
+        <table class="ptable">
+          <tr><th>Asset Type</th><th>Complexity Level</th><th>Cost Estimate</th><th>TAT</th></tr>
+          <tr><td>Mobile Game Character</td><td>Low Poly (hand-painted)</td><td>$150 – $500</td><td>5–10 Days</td></tr>
+          <tr><td>Indie Game Hero</td><td>Mid-Tier (PBR, standard skeleton)</td><td>$500 – $1,200</td><td>2–4 Weeks</td></tr>
+          <tr><td>AAA Hero Character</td><td>High-End (GoW quality)</td><td>$1,000 – $5,000</td><td>5–8 Weeks</td></tr>
+          <tr><td>NPC / Enemy</td><td>Standard (shared skeleton)</td><td>$800 – $2,000</td><td>2 Weeks</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="gc pt-container reveal">
+      <div class="pt-header">🖨️ For 3D Printing</div>
+      <div class="pt-wrap">
+        <table class="ptable">
+          <tr><th>Asset Type</th><th>Use Case</th><th>Cost Estimate</th><th>TAT</th></tr>
+          <tr><td>Miniature (D&amp;D / Warhammer)</td><td>Static Pose (32–75mm, resin)</td><td>$100 – $600</td><td>3–7 Days</td></tr>
+          <tr><td>Action Figure (Toy)</td><td>Articulated (ball joints, pins)</td><td>$300 – $1,000</td><td>2–4 Weeks</td></tr>
+          <tr><td>Collectibles / Statues</td><td>Large Scale (hollowed for resin)</td><td>$200 – $1,000</td><td>3–6 Weeks</td></tr>
+          <tr><td>Cosplay Prop / Armor</td><td>Wearable (sliced for printer)</td><td>$300 – $1,200</td><td>1–3 Weeks</td></tr>
+        </table>
+      </div>
+    </div>
+    <p class="disclaimer">* TAT could change depending on workload and complexity.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ CONTACT ═══ -->
+<div class="section-wrap" id="contact">
+  <div class="section-header reveal">
+    <span class="section-label">✦ Get In Touch</span>
+    <h2 class="section-title">Commission Me</h2>
+    <p class="section-sub">Commissions are open! Reach out through any of these channels.</p>
+  </div>
+  <div class="contact-grid">
+    <a href="https://www.instagram.com/dravex_studio" target="_blank" rel="noopener" class="gc ccard reveal">
+      <div class="ccard-icon ci-ig">📸</div>
+      <h3>Instagram</h3>
+      <p>@dravex_studio</p>
+      <span class="chint">→ DM for commissions</span>
+    </a>
+    <a href="https://discord.com/users/dravex_studio" target="_blank" rel="noopener" class="gc ccard reveal">
+      <div class="ccard-icon ci-dc">🎮</div>
+      <h3>Discord</h3>
+      <p>dravex_studio</p>
+      <span class="chint">→ Message me directly</span>
+    </a>
+    <a href="mailto:dravexstudio@gmail.com" class="gc ccard reveal">
+      <div class="ccard-icon ci-em">✉️</div>
+      <h3>Email</h3>
+      <p>dravexstudio@gmail.com</p>
+      <span class="chint">→ For detailed inquiries</span>
+    </a>
+  </div>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="flogo">DRAVEX</div>
+  <p class="ftag">Creating worlds, characters &amp; experiences — one pixel at a time.</p>
+  <div class="flinks">
+    <a href="#services">Services</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <p class="fcopy">© 2025 Dravex Studio · All Rights Reserved</p>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <button class="lbclose" onclick="closeLightbox()">✕</button>
+  <img class="lightbox-img" id="lbImg" src="" alt="Portfolio image">
+</div>
+
+<script>
+/* ═══ CURSOR GLOW TRAIL ═══ */
+const dot=document.getElementById('cursorDot');
+const ring=document.getElementById('cursorRing');
+const cc=document.getElementById('cursorCanvas');
+const cctx=cc.getContext('2d');
+let mx=0,my=0,rx=0,ry=0;
+const trail=[];
+function resizeCursor(){cc.width=window.innerWidth;cc.height=window.innerHeight;}
+resizeCursor();
+window.addEventListener('resize',resizeCursor);
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  dot.style.left=mx+'px';dot.style.top=my+'px';
+  trail.push({x:mx,y:my,op:1,r:16});
+  if(trail.length>40)trail.shift();
+});
+function animCursor(){
+  rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  cctx.clearRect(0,0,cc.width,cc.height);
+  trail.forEach((p,i)=>{
+    p.op*=.88;
+    const sz=(i/trail.length)*p.r;
+    if(sz<0.5)return;
+    const g=cctx.createRadialGradient(p.x,p.y,0,p.x,p.y,sz);
+    g.addColorStop(0,`rgba(168,85,247,${p.op*.7})`);
+    g.addColorStop(.5,`rgba(232,121,249,${p.op*.3})`);
+    g.addColorStop(1,'rgba(168,85,247,0)');
+    cctx.beginPath();cctx.arc(p.x,p.y,sz,0,Math.PI*2);
+    cctx.fillStyle=g;cctx.fill();
+  });
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+
+/* ═══ PARTICLES ═══ */
+const pcvs=document.getElementById('particlesCanvas');
+const pctx=pcvs.getContext('2d');
+let pts=[],PW,PH;
+const COLORS=['rgba(168,85,247,','rgba(232,121,249,','rgba(34,211,238,','rgba(251,191,36,'];
+function resizePts(){PW=pcvs.width=window.innerWidth;PH=pcvs.height=window.innerHeight;}
+function mkPt(){return{x:Math.random()*PW,y:PH+10,r:Math.random()*2.5+.5,sp:Math.random()*.65+.2,op:Math.random()*.35+.06,wb:Math.random()*Math.PI*2,wbs:(Math.random()-.5)*.016,wba:Math.random()*25+8,col:COLORS[Math.floor(Math.random()*COLORS.length)]};}
+function initPts(){pts=[];for(let i=0;i<70;i++){const p=mkPt();p.y=Math.random()*PH;pts.push(p);}}
+function animPts(){
+  pctx.clearRect(0,0,PW,PH);
+  pts.forEach((p,i)=>{
+    p.y-=p.sp;p.wb+=p.wbs;
+    const x=p.x+Math.sin(p.wb)*p.wba;
+    pctx.beginPath();pctx.arc(x,p.y,p.r,0,Math.PI*2);
+    pctx.fillStyle=p.col+p.op+')';pctx.fill();
+    if(p.y<-10)pts[i]=mkPt();
+  });
+  requestAnimationFrame(animPts);
+}
+resizePts();initPts();animPts();
+window.addEventListener('resize',()=>{resizePts();initPts();});
+
+/* ═══ PARALLAX + NAVBAR ═══ */
+const heroContent=document.getElementById('heroContent');
+const nav=document.getElementById('navbar');
+window.addEventListener('scroll',()=>{
+  const sy=window.scrollY;
+  if(heroContent&&sy<window.innerHeight){
+    heroContent.style.transform=`translateY(${sy*.3}px)`;
+    heroContent.style.opacity=Math.max(0,1-sy/(window.innerHeight*.72));
+  }
+  sy>50?nav.classList.add('scrolled'):nav.classList.remove('scrolled');
+},{passive:true});
+
+/* ═══ TYPING ANIMATION ═══ */
+const typingTexts=['2D Character Art','VTuber Models','3D Game Assets','Pin Designs','Emotes & Alerts','Live2D Rigging','Enamel Pin Art'];
+let ti=0,ci=0,deleting=false;
+const typingEl=document.getElementById('typingText');
+function type(){
+  if(!typingEl)return;
+  const cur=typingTexts[ti];
+  if(!deleting){
+    typingEl.textContent=cur.slice(0,++ci);
+    if(ci===cur.length){deleting=true;setTimeout(type,2000);return;}
+  }else{
+    typingEl.textContent=cur.slice(0,--ci);
+    if(ci===0){deleting=false;ti=(ti+1)%typingTexts.length;}
+  }
+  setTimeout(type,deleting?55:95);
+}
+type();
+
+/* ═══ SCROLL REVEAL ═══ */
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target);}});
+},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+/* ═══ CARD TILT ═══ */
+document.querySelectorAll('.gc').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const x=e.clientX-r.left,y=e.clientY-r.top;
+    const cx=r.width/2,cy=r.height/2;
+    const rotX=((y-cy)/cy)*-10;
+    const rotY=((x-cx)/cx)*10;
+    card.style.transform=`perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-6px) scale(1.02)`;
+  });
+  card.addEventListener('mouseleave',()=>{card.style.transform='';});
+});
+
+/* ═══ PRICING TABS ═══ */
+function switchTab(tab){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.ppanel').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+  const panel=document.getElementById('tab-'+tab);
+  panel.classList.add('active');
+  panel.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'));
+}
+
+/* ═══ LIGHTBOX ═══ */
+function openLightbox(src){document.getElementById('lbImg').src=src;document.getElementById('lightbox').classList.add('active');document.body.style.overflow='hidden';}
+function closeLightbox(e){
+  if(!e||e.target===document.getElementById('lightbox')||e.target.classList.contains('lbclose')){
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow='';
+  }
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
+document.querySelectorAll('.gallery-item img').forEach(img=>{img.parentElement.addEventListener('click',()=>openLightbox(img.src));});
+
+/* ═══ MOBILE MENU ═══ */
+function toggleMenu(){document.getElementById('navLinks').classList.toggle('open');document.getElementById('hamburger').classList.toggle('open');}
+function closeMenu(){document.getElementById('navLinks').classList.remove('open');document.getElementById('hamburger').classList.remove('open');}
+</script>
+</body>
+</html>
